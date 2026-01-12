@@ -46,10 +46,9 @@ cd claude-code-for-pmm
 ### 2. Run Setup (2 minutes)
 
 **Auto-detect (recommended):**
-```bash
-./setup
 ```
-This will automatically detect your OS and run the appropriate script.
+Ask claude to: Help me get setup
+```
 
 **Manual options:**
 
@@ -200,7 +199,7 @@ The `core/` directory contains the reusable system. Contributions should:
 
 ## Acknowledgments
 
-This project is built on [PersonalOS](https://github.com/amanaiproduct/personal-os) by [Aman Khan](https://x.com/_amankhan).
+This project is built on [PersonalOS](https://github.com/amanaiproduct/personal-os) by [Aman Khan](https://github.com/amanaiproduct).
 
 **Original Work:**
 - **PersonalOS** by Aman Khan
