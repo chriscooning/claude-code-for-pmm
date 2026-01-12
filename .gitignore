@@ -1,0 +1,61 @@
+# Template .gitignore for Task Management System
+# Copy relevant parts to your .gitignore
+
+# Personal task files
+Tasks/*.md
+!Tasks/.gitkeep
+!Tasks/README.md
+BACKLOG.md
+
+# Personal knowledge files
+Knowledge/*.md
+!Knowledge/.gitkeep
+!Knowledge/README.md
+
+# Personal configuration
+CLAUDE.md       # If customized from template
+GOALS.md        # Personal goals
+
+# Keep templates and examples
+!CLAUDE_TEMPLATE.md
+!config.example.yaml
+!Tasks/example.md
+!CRM/example.md
+
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+.Python
+venv/
+.venv/
+env/
+.env
+
+# IDE & Editor configs
+.vscode/
+.idea/
+.obsidian/
+*.swp
+*.swo
+*~
+.DS_Store
+
+# Tool-specific
+.specstory/
+.factory/
+
+# Logs
+*.log
+logs/
+
+# Testing
+test_*.py
+*.test.py
+.pytest_cache/
+.coverage
+
+# MCP/System
+.mcp_cache/
+*.pid
+*.lock
