@@ -59,20 +59,7 @@ ask_multiline() {
     echo "$response"
 }
 
-# Start setup
-clear
-print_header "Welcome to Claude Code for PMM Setup"
-
-echo "This setup will help you:"
-echo "  1. Create your workspace structure"
-echo "  2. Define your goals and priorities"
-echo "  3. Configure your AI assistant"
-echo ""
-echo "Takes about 2 minutes. Be honest and specific."
-echo ""
-read -p "Press Enter to begin..."
-
-# Create directories
+# Create workspace structure first (works in both interactive and non-interactive modes)
 print_header "Creating Workspace"
 
 for dir in "Tasks" "Knowledge"; do
@@ -124,6 +111,143 @@ else
     print_info "File exists: BACKLOG.md"
 fi
 
+# Check if running interactively
+if [ ! -t 0 ]; then
+    # Running non-interactively (e.g., by Claude)
+    echo ""
+    echo "=== Setup Script Detected Non-Interactive Execution ==="
+    echo ""
+    echo "I see the setup script was run, but it requires interactive input."
+    echo "Let me help you set up your goals through conversation instead!"
+    echo ""
+    echo "I'll ask you a few questions about your goals and priorities, then"
+    echo "create your GOALS.md file. Ready to begin?"
+    echo ""
+    echo "Here are the questions I'll ask:"
+    echo ""
+    echo "1. What's your current role?"
+    echo "2. What company do you work for?"
+    echo "3. What product(s) or service(s) do you work on?"
+    echo "4. Who is your primary target audience/customer?"
+    echo "5. What industry or domain?"
+    echo "6. What are your typical work hours?"
+    echo "7. What's your primary professional vision?"
+    echo "8. What would make this a successful year?"
+    echo "9. What are your objectives for this quarter?"
+    echo "10. What are your top 3 priorities right now?"
+    echo ""
+    echo "Let's start! What's your current role?"
+    exit 0
+fi
+
+# Start setup
+clear
+print_header "Welcome to Claude Code for PMM Setup"
+
+echo "This setup will help you:"
+echo "  1. Create your workspace structure"
+echo "  2. Define your goals and priorities"
+echo "  3. Configure your AI assistant"
+echo ""
+echo "Takes about 2 minutes. Be honest and specific."
+echo ""
+echo "Note: You can update your goals anytime in the future by:"
+echo "      - Asking Claude: 'can we update my goals?'"
+echo "      - Editing GOALS.md directly in your IDE (like Cursor)"
+echo ""
+read -p "Press Enter to begin..."
+
+
+# Check if project is already set up
+IS_SETUP=false
+if [ -f "GOALS.md" ]; then
+    # Check if GOALS.md is not just a placeholder
+    if ! grep -q "This file will be generated during setup" "GOALS.md"; then
+        IS_SETUP=true
+    fi
+fi
+
+if [ "$IS_SETUP" = true ]; then
+    # Project is already set up - offer update mode
+    print_header "Project Already Set Up"
+    echo "I see you already have GOALS.md configured."
+    echo ""
+    echo "What would you like to update?"
+    echo ""
+    echo "  1. Full setup (recreate everything)"
+    echo "  2. Update goals and priorities only"
+    echo "  3. Update work schedule preferences only"
+    echo "  4. Update product/company context only"
+    echo "  5. Cancel (exit setup)"
+    echo ""
+    read -p "Enter your choice (1-5): " update_choice
+    
+    case "$update_choice" in
+        1)
+            echo ""
+            echo "Running full setup..."
+            echo ""
+            # Continue with full setup below
+            ;;
+        2)
+            echo ""
+            echo "We'll update your goals and priorities."
+            echo ""
+            echo "You can update GOALS.md by:"
+            echo "  - Asking Claude: 'can we update my goals?'"
+            echo "  - Editing GOALS.md directly in your IDE (like Cursor)"
+            echo ""
+            exit 0
+            ;;
+        3)
+            echo ""
+            echo "We'll update your work schedule preferences."
+            echo ""
+            echo "You can update GOALS.md by:"
+            echo "  - Asking Claude: 'can we update my goals?'"
+            echo "  - Editing GOALS.md directly in your IDE (like Cursor)"
+            echo ""
+            exit 0
+            ;;
+        4)
+            echo ""
+            echo "We'll update your product/company context."
+            echo ""
+            echo "You can update GOALS.md by:"
+            echo "  - Asking Claude: 'can we update my goals?'"
+            echo "  - Editing GOALS.md directly in your IDE (like Cursor)"
+            echo ""
+            exit 0
+            ;;
+        5)
+            echo ""
+            echo "Setup cancelled."
+            exit 0
+            ;;
+        *)
+            echo ""
+            echo "Invalid choice. Running full setup..."
+            echo ""
+            ;;
+    esac
+fi
+
+# Create placeholder GOALS.md (will be replaced during setup)
+if [ ! -f "GOALS.md" ]; then
+    cat > "GOALS.md" << 'EOF'
+# Goals & Strategic Direction
+
+*This file will be generated during setup. Run the setup script to create your personalized goals.*
+
+## Quick Setup
+
+Run `./setup` (Mac/Linux) or `setup.bat` (Windows) to configure your goals and priorities.
+EOF
+    print_success "Created: GOALS.md (placeholder)"
+elif [ "$IS_SETUP" = false ]; then
+    print_info "File exists: GOALS.md (will be updated during setup)"
+fi
+
 # Goals creation
 print_header "Building Your Personal Goals"
 
@@ -150,8 +274,8 @@ ans_role=$(ask_question \
 print_header "1.5. Product & Company Context"
 
 ans_company=$(ask_question \
-    "What company do you work for? (or 'Independent' if freelance)" \
-    "Acme Corp, Independent, StartupXYZ")
+    "What company do you work for?" \
+    "")
 
 ans_product=$(ask_question \
     "What product(s) or service(s) do you work on?" \
@@ -219,15 +343,33 @@ ans_top3=$(ask_question \
     "What are your top 3 priorities right now? (Be brutally honest)" \
     "1. Ship Q1 roadmap, 2. Build thought leadership, 3. Develop AI product skills")
 
+# Section 6: Skills & Relationships
+print_header "6. Skills & Relationships"
+
+ans_skills=$(ask_question \
+    "What skills do you need to develop to achieve your vision?" \
+    "")
+
+ans_relationships=$(ask_question \
+    "What key relationships or network do you need to build?" \
+    "")
+
+# Section 7: Challenges & Opportunities
+print_header "7. Challenges & Opportunities"
+
+ans_challenges=$(ask_question \
+    "What's currently blocking you or slowing you down?" \
+    "")
+
+ans_opportunities=$(ask_question \
+    "What opportunities are you exploring or considering?" \
+    "")
+
 # Set empty placeholders for sections user can fill in later
 ans_vision_why=""
 ans_success_5yr=""
 ans_current_focus=""
 ans_q1_metrics=""
-ans_skills=""
-ans_relationships=""
-ans_challenges=""
-ans_opportunities=""
 
 # Generate GOALS.md
 print_header "Generating Your GOALS.md"

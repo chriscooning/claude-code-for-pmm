@@ -5,6 +5,20 @@
 
 $ErrorActionPreference = "Stop"
 
+# Set console encoding to UTF-8 for proper character display
+[Console]::OutputEncoding = [System.Text.Encoding]::UTF8
+$OutputEncoding = [System.Text.Encoding]::UTF8
+
+# Helper function to write UTF-8 files without BOM (PowerShell 5.1 compatible)
+function Write-UTF8FileNoBOM {
+    param(
+        [string]$Path,
+        [string]$Content
+    )
+    $Utf8NoBomEncoding = New-Object System.Text.UTF8Encoding $False
+    [System.IO.File]::WriteAllText($Path, $Content, $Utf8NoBomEncoding)
+}
+
 # Functions
 function Print-Header {
     param([string]$Text)
@@ -17,12 +31,12 @@ function Print-Header {
 
 function Print-Success {
     param([string]$Message)
-    Write-Host "✓ $Message" -ForegroundColor Green
+    Write-Host "[OK] $Message" -ForegroundColor Green
 }
 
 function Print-Info {
     param([string]$Message)
-    Write-Host "ℹ $Message" -ForegroundColor Blue
+    Write-Host "[INFO] $Message" -ForegroundColor Blue
 }
 
 function Print-Warning {
@@ -62,20 +76,7 @@ function Ask-Multiline {
     return ($lines -join "`n")
 }
 
-# Start setup
-Clear-Host
-Print-Header "Welcome to Claude Code for PMM Setup"
-
-Write-Host "This setup will help you:"
-Write-Host "  1. Create your workspace structure"
-Write-Host "  2. Define your goals and priorities"
-Write-Host "  3. Configure your AI assistant"
-Write-Host ""
-Write-Host "Takes about 2 minutes. Be honest and specific."
-Write-Host ""
-Read-Host "Press Enter to begin..."
-
-# Create directories
+# Create workspace structure first (works in both interactive and non-interactive modes)
 Print-Header "Creating Workspace"
 
 $dirs = @("Tasks", "Knowledge")
@@ -132,10 +133,155 @@ if (-not (Test-Path "BACKLOG.md")) {
 
 Drop raw notes or todos here. Say `process my backlog` when you're ready for triage.
 "@
-    Set-Content -Path "BACKLOG.md" -Value $backlogContent -Encoding UTF8
+    Write-UTF8FileNoBOM -Path "BACKLOG.md" -Content $backlogContent
     Print-Success "Created: BACKLOG.md"
 } else {
     Print-Info "File exists: BACKLOG.md"
+}
+
+# Check if running interactively
+try {
+    $null = $Host.UI.RawUI
+    $isInteractive = $true
+} catch {
+    $isInteractive = $false
+}
+
+if (-not $isInteractive -or [Console]::IsInputRedirected) {
+    # Running non-interactively (e.g., by Claude)
+    Write-Host ""
+    Write-Host "=== Setup Script Detected Non-Interactive Execution ==="
+    Write-Host ""
+    Write-Host "I see the setup script was run, but it requires interactive input."
+    Write-Host "Let me help you set up your goals through conversation instead!"
+    Write-Host ""
+    Write-Host "I'll ask you a few questions about your goals and priorities, then"
+    Write-Host "create your GOALS.md file. Ready to begin?"
+    Write-Host ""
+    Write-Host "Here are the questions I'll ask:"
+    Write-Host ""
+    Write-Host "1. What's your current role?"
+    Write-Host "2. What company do you work for?"
+    Write-Host "3. What product(s) or service(s) do you work on?"
+    Write-Host "4. Who is your primary target audience/customer?"
+    Write-Host "5. What industry or domain?"
+    Write-Host "6. What are your typical work hours?"
+    Write-Host "7. What's your primary professional vision?"
+    Write-Host "8. What would make this a successful year?"
+    Write-Host "9. What are your objectives for this quarter?"
+    Write-Host "10. What are your top 3 priorities right now?"
+    Write-Host ""
+    Write-Host "Let's start! What's your current role?"
+    exit 0
+}
+
+# Start setup
+Clear-Host
+Print-Header "Welcome to Claude Code for PMM Setup"
+
+Write-Host "This setup will help you:"
+Write-Host "  1. Create your workspace structure"
+Write-Host "  2. Define your goals and priorities"
+Write-Host "  3. Configure your AI assistant"
+Write-Host ""
+Write-Host "Takes about 2 minutes. Be honest and specific."
+Write-Host ""
+Write-Host "Note: You can update your goals anytime in the future by:"
+Write-Host "      - Asking Claude: 'can we update my goals?'"
+Write-Host "      - Editing GOALS.md directly in your IDE (like Cursor)"
+Write-Host ""
+Read-Host "Press Enter to begin..."
+
+
+# Check if project is already set up
+$isSetup = $false
+if (Test-Path "GOALS.md") {
+    $goalsContent = Get-Content "GOALS.md" -Raw
+    if ($goalsContent -notmatch "This file will be generated during setup") {
+        $isSetup = $true
+    }
+}
+
+if ($isSetup) {
+    # Project is already set up - offer update mode
+    Print-Header "Project Already Set Up"
+    Write-Host "I see you already have GOALS.md configured."
+    Write-Host ""
+    Write-Host "What would you like to update?"
+    Write-Host ""
+    Write-Host "  1. Full setup (recreate everything)"
+    Write-Host "  2. Update goals and priorities only"
+    Write-Host "  3. Update work schedule preferences only"
+    Write-Host "  4. Update product/company context only"
+    Write-Host "  5. Cancel (exit setup)"
+    Write-Host ""
+    $updateChoice = Read-Host "Enter your choice (1-5)"
+    
+    switch ($updateChoice) {
+        "1" {
+            Write-Host ""
+            Write-Host "Running full setup..."
+            Write-Host ""
+            # Continue with full setup below
+        }
+        "2" {
+            Write-Host ""
+            Write-Host "We'll update your goals and priorities."
+            Write-Host ""
+            Write-Host "You can update GOALS.md by:"
+            Write-Host "  - Asking Claude: 'can we update my goals?'"
+            Write-Host "  - Editing GOALS.md directly in your IDE (like Cursor)"
+            Write-Host ""
+            exit 0
+        }
+        "3" {
+            Write-Host ""
+            Write-Host "We'll update your work schedule preferences."
+            Write-Host ""
+            Write-Host "You can update GOALS.md by:"
+            Write-Host "  - Asking Claude: 'can we update my goals?'"
+            Write-Host "  - Editing GOALS.md directly in your IDE (like Cursor)"
+            Write-Host ""
+            exit 0
+        }
+        "4" {
+            Write-Host ""
+            Write-Host "We'll update your product/company context."
+            Write-Host ""
+            Write-Host "You can update GOALS.md by:"
+            Write-Host "  - Asking Claude: 'can we update my goals?'"
+            Write-Host "  - Editing GOALS.md directly in your IDE (like Cursor)"
+            Write-Host ""
+            exit 0
+        }
+        "5" {
+            Write-Host ""
+            Write-Host "Setup cancelled."
+            exit 0
+        }
+        default {
+            Write-Host ""
+            Write-Host "Invalid choice. Running full setup..."
+            Write-Host ""
+        }
+    }
+}
+
+# Create placeholder GOALS.md (will be replaced during setup)
+if (-not (Test-Path "GOALS.md")) {
+    $goalsPlaceholder = @"
+# Goals & Strategic Direction
+
+*This file will be generated during setup. Run the setup script to create your personalized goals.*
+
+## Quick Setup
+
+Run `./setup` (Mac/Linux) or `setup.bat` (Windows) to configure your goals and priorities.
+"@
+    Write-UTF8FileNoBOM -Path "GOALS.md" -Content $goalsPlaceholder
+    Print-Success "Created: GOALS.md (placeholder)"
+} elseif (-not $isSetup) {
+    Print-Info "File exists: GOALS.md (will be updated during setup)"
 }
 
 # Goals creation
@@ -164,8 +310,8 @@ $ans_role = Ask-Question `
 Print-Header "1.5. Product & Company Context"
 
 $ans_company = Ask-Question `
-    "What company do you work for? (or 'Independent' if freelance)" `
-    "Acme Corp, Independent, StartupXYZ"
+    "What company do you work for?" `
+    ""
 
 $ans_product = Ask-Question `
     "What product(s) or service(s) do you work on?" `
@@ -233,15 +379,33 @@ $ans_top3 = Ask-Question `
     "What are your top 3 priorities right now? (Be brutally honest)" `
     "1. Ship Q1 roadmap, 2. Build thought leadership, 3. Develop AI product skills"
 
-# Set empty placeholders
+# Section 6: Skills & Relationships
+Print-Header "6. Skills & Relationships"
+
+$ans_skills = Ask-Question `
+    "What skills do you need to develop to achieve your vision?" `
+    ""
+
+$ans_relationships = Ask-Question `
+    "What key relationships or network do you need to build?" `
+    ""
+
+# Section 7: Challenges & Opportunities
+Print-Header "7. Challenges & Opportunities"
+
+$ans_challenges = Ask-Question `
+    "What's currently blocking you or slowing you down?" `
+    ""
+
+$ans_opportunities = Ask-Question `
+    "What opportunities are you exploring or considering?" `
+    ""
+
+# Set empty placeholders for sections user can fill in later
 $ans_vision_why = ""
 $ans_success_5yr = ""
 $ans_current_focus = ""
 $ans_q1_metrics = ""
-$ans_skills = ""
-$ans_relationships = ""
-$ans_challenges = ""
-$ans_opportunities = ""
 
 # Generate GOALS.md
 Print-Header "Generating Your GOALS.md"
@@ -349,7 +513,7 @@ $ans_top3
 *Review and update this weekly as your priorities shift.*
 "@
 
-Set-Content -Path "GOALS.md" -Value $goalsContent -Encoding UTF8
+Write-UTF8FileNoBOM -Path "GOALS.md" -Content $goalsContent
 Print-Success "Created: GOALS.md"
 
 # Create product context file
@@ -392,7 +556,7 @@ $competitorsSectionContext## Key Messaging Points
 - Evening preferences: $eveningDefault
 "@
 
-Set-Content -Path "Knowledge/product-context.md" -Value $productContextContent -Encoding UTF8
+Write-UTF8FileNoBOM -Path "Knowledge/product-context.md" -Content $productContextContent
 Print-Success "Created: Knowledge/product-context.md"
 
 # Final summary
@@ -400,7 +564,7 @@ Print-Header "Setup Complete!"
 
 Write-Host "Your Claude Code for PMM is ready to use."
 Write-Host ""
-Write-Host "📋 Next Steps:"
+Write-Host "Next Steps:"
 Write-Host ""
 Write-Host "1. Review GOALS.md and refine as needed"
 Write-Host "2. Read AGENTS.md to understand how your AI agent works"

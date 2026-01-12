@@ -45,17 +45,24 @@ cd claude-code-for-pmm
 
 ### 2. Run Setup (2 minutes)
 
-**Windows:**
+**Auto-detect (recommended):**
+```bash
+./setup
+```
+This will automatically detect your OS and run the appropriate script.
+
+**Manual options:**
+
+Windows:
 ```batch
 setup.bat
 ```
-
 Or directly with PowerShell:
 ```powershell
 .\setup.ps1
 ```
 
-**Mac/Linux:**
+Mac/Linux:
 ```bash
 ./setup.sh
 ```
