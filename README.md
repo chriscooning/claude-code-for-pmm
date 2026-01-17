@@ -4,6 +4,8 @@
 [![X](https://img.shields.io/badge/X-@__amankhan-blue?logo=x&logoColor=white)](https://x.com/_amankhan)
 [![Star this repo](https://img.shields.io/github/stars/amanaiproduct/personal-os?style=social)](https://github.com/amanaiproduct/personal-os)
 
+Last updated: 2026-01-16
+
 Your AI-powered task management system that keeps you focused on what matters.
 
 ## About
@@ -46,8 +48,9 @@ cd claude-code-for-pmm
 ### 2. Run Setup (2 minutes)
 
 **Auto-detect (recommended):**
+Ask claude to:
 ```
-Ask claude to: Help me get setup
+Help me get setup
 ```
 
 **Manual options:**
