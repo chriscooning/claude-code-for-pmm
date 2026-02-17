@@ -8,13 +8,19 @@ Tasks/*.md
 BACKLOG.md
 
 # Personal knowledge files
-Knowledge/*.md
+Knowledge/**
 !Knowledge/.gitkeep
 !Knowledge/README.md
+
+# Clippings
+Clippings/
 
 # Personal configuration
 CLAUDE.md       # If customized from template
 GOALS.md        # Personal goals
+
+# AI chat imports (Nexus plugin)
+ai-brain/
 
 # Keep templates and examples
 !CLAUDE_TEMPLATE.md

@@ -1,8 +1,5 @@
 # Claude Code for PMM
 
-[![License](https://img.shields.io/badge/License-CC%20BY--NC--SA%204.0-orange)](https://creativecommons.org/licenses/by-nc-sa/4.0/)
-[![X](https://img.shields.io/badge/X-@__amankhan-blue?logo=x&logoColor=white)](https://x.com/_amankhan)
-[![Star this repo](https://img.shields.io/github/stars/amanaiproduct/personal-os?style=social)](https://github.com/amanaiproduct/personal-os)
 
 Last updated: 2026-01-16
 
